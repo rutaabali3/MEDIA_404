@@ -1,7 +1,7 @@
 {
   "name": "mediagrab-404-web",
   "version": "1.0.0",
-  "description": "MediaGrab 404 — paste any post or product link, get its media. Server-side extraction + download proxy.",
+  "description": "MediaGrab 404 — paste any post or product link, get its media. Client-side extraction in the browser.",
   "main": "server.js",
   "license": "MIT",
   "engines": {

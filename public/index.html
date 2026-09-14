@@ -29,15 +29,6 @@
 
   <main class="wrap">
 
-    <div id="gh-banner" class="gh-banner" hidden>
-      <span class="msr">cloud_off</span>
-      <div>
-        <b>This GitHub Pages copy is static</b> — grabbing media needs the Node server.
-        <a href="https://codespaces.new/rutaabali3/MEDIA_404">Open in GitHub Codespaces</a>
-        or clone the repo and run <code>npm install && npm start</code>.
-      </div>
-    </div>
-
     <!-- link input -->
     <section class="grab-card">
       <div class="grab-row">
@@ -85,8 +76,8 @@
     <section class="card" id="notes-card">
       <h2><span class="msr">info</span>Good to know</h2>
       <ul class="notes">
+        <li><b>Runs in your browser.</b> No server and no install — paste a public link and Grab. Sites that block CORS are retried through public relays.</li>
         <li><b>Public content only.</b> Posts and product pages everyone can see. Content hidden behind a login can't be reached by any web tool.</li>
-        <li><b>Downloads are proxied</b> through the server, so CDNs that block hotlinking still work.</li>
         <li><b>No DRM.</b> Netflix, Spotify, Prime Video are encrypted by design and not supported.</li>
         <li><b>YouTube:</b> covers and page media only — full video downloads break YouTube's terms.</li>
         <li><b>Live streams (m3u8)</b> are listed as links — feed them to yt-dlp / ffmpeg to merge.</li>
@@ -96,7 +87,7 @@
 
   <!-- bottom app bar: same as the extension footer -->
   <footer id="mg-foot">
-    <span id="mg-foot-note">Public content only — any link you can open works</span>
+    <span id="mg-foot-note">Runs in your browser — public links only</span>
     <button id="btn-sel" class="mg-btn mg-text">Select all</button>
     <button id="btn-dl" class="mg-btn mg-fab" disabled><span class="msr msr-18">download</span><span id="btn-dl-lbl">Download 0</span></button>
   </footer>

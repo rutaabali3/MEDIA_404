@@ -3,17 +3,13 @@
  * Same UI flow as the extension popup:
  *   app bar (detected app + exact logo + pills) → grab →
  *   chips + cards grid → select → bottom bar Download → sheet.
- * grab(url) → /api/extract · downloads → /api/download proxy.
+ * grab(url) → client-side extract.js (browser). Downloads save as blobs.
  * ============================================================ */
 (function () {
   'use strict';
 
   const RECENT_KEY = 'mg404-recents';
   const SETTINGS_KEY = 'mg404-settings';
-  const GH_CODESPACES = 'https://codespaces.new/rutaabali3/MEDIA_404';
-  const GH_CLONE = 'https://github.com/rutaabali3/MEDIA_404';
-
-  let apiReady = true;
 
   const STATE = {
     site: MG.UNIVERSAL,
@@ -141,28 +137,18 @@
   }
   function hideError() { $('#grab-err').hidden = true; }
 
-  async function checkApi() {
-    try {
-      const r = await fetch('/api/health', { cache: 'no-store' });
-      apiReady = !!(r && r.ok);
-    } catch (e) {
-      apiReady = false;
+  function runExtract(url) {
+    if (typeof window.__MG_TEST_EXTRACT === 'function') return window.__MG_TEST_EXTRACT(url);
+    if (!window.__MGExtract || typeof window.__MGExtract.extract !== 'function') {
+      return Promise.reject(new Error('Extractor failed to load'));
     }
-    const banner = $('#gh-banner');
-    if (banner) banner.hidden = apiReady;
-    if (!apiReady) {
-      setStatus('server not running — use GitHub Codespaces or clone the repo');
-    }
+    return window.__MGExtract.extract(url);
   }
 
   async function grab(url) {
     url = String(url || '').trim();
     if (!url) return;
     if (STATE.busy) return;
-    if (!apiReady) {
-      showError('The extract API is not running here (GitHub Pages is static). Open in Codespaces: ' + GH_CODESPACES + ' — or clone ' + GH_CLONE);
-      return;
-    }
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     let valid;
     try { valid = new URL(url); } catch (e) { showError('That link looks invalid.'); return; }
@@ -175,9 +161,8 @@
     const t0 = Date.now();
 
     try {
-      const resp = await fetch('/api/extract?url=' + encodeURIComponent(url));
-      const data = await resp.json();
-      if (!resp.ok || !data.ok) throw new Error(data.error || 'Extraction failed (HTTP ' + resp.status + ')');
+      const data = await runExtract(url);
+      if (!data || !data.ok) throw new Error((data && data.error) || 'Extraction failed');
 
       STATE.site = MG.siteById(data.site && data.site.id) ||
         MG.siteById(MG.detectSite(hostOf(data.finalUrl || url)).id);
@@ -239,7 +224,7 @@
     const sel = STATE.selected.has(it.url);
     let inner;
     if (thumb) {
-      inner = '<img class="thumb" loading="lazy" src="' + esc(thumb) + '" alt=""' +
+      inner = '<img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="' + esc(thumb) + '" alt=""' +
         ' onerror="this.outerHTML=\'<div class=ph><span class=msr>' + meta.icon + '</span><b>' + esc(meta.label) + '</b></div>\'">';
     } else {
       inner = '<div class="ph"><span class="msr">' + meta.icon + '</span><b>' + esc(meta.label) + '</b></div>';
@@ -282,10 +267,19 @@
     $('#btn-dl-lbl').textContent = 'Download ' + STATE.selected.size;
   }
 
-  /* ---------------- downloads ---------------- */
-  function dlUrl(url, name) {
+  /* ---------------- downloads (client-side blob, else open the file) ---------------- */
+  async function dlUrl(url, name) {
+    try {
+      if (window.__MGExtract && typeof window.__MGExtract.download === 'function' && typeof window.__MG_TEST_EXTRACT !== 'function') {
+        await window.__MGExtract.download(url, name);
+        return;
+      }
+    } catch (e) { /* fall through to direct link */ }
     const a = document.createElement('a');
-    a.href = '/api/download?url=' + encodeURIComponent(url) + '&name=' + encodeURIComponent(name || '');
+    a.href = url;
+    a.download = name || '';
+    a.rel = 'noopener';
+    a.target = '_blank';
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
@@ -310,7 +304,7 @@
     for (let i = 0; i < list.length; i++) {
       const it = STATE.items.find((x) => x.url === list[i]) || { url: list[i], kind: 'video' };
       bar.style.width = Math.round((i / list.length) * 100) + '%';
-      dlUrl(it.url, it.name);
+      await dlUrl(it.url, it.name);
       await new Promise((r) => setTimeout(r, 400));
     }
     bar.style.width = '100%';

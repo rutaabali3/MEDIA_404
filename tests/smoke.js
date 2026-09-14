@@ -46,12 +46,10 @@ function buildHtml() {
   const html = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   const mock = '<script>' +
     'window.__fetches = []; window.__dls = [];' +
+    'window.__MG_TEST_EXTRACT = function(){ return Promise.resolve(' + JSON.stringify(FIXTURE) + '); };' +
     'window.fetch = function(u, o) {' +
     '  window.__fetches.push(String(u));' +
-    '  if (String(u).includes("/api/extract")) {' +
-    '    return Promise.resolve({ ok: true, json: function(){ return Promise.resolve(' + JSON.stringify(FIXTURE) + '); } });' +
-    '  }' +
-    '  return Promise.resolve({ ok: true, status: 200 });' +
+    '  return Promise.resolve({ ok: true, status: 200, blob: function(){ return Promise.resolve(new Blob(["x"])); }, text: function(){ return Promise.resolve(""); }, json: function(){ return Promise.resolve({}); }, arrayBuffer: function(){ return Promise.resolve(new ArrayBuffer(0)); } });' +
     '};' +
     'window.HTMLAnchorElement.prototype.click = function(){ window.__dls.push(this.href); };' +
     '</script>';
@@ -59,6 +57,7 @@ function buildHtml() {
   return html
     .split('<script src="sites.js"></script>').join(inline('sites.js'))
     .split('<script src="logos.js"></script>').join(inline('logos.js'))
+    .split('<script src="extract.js"></script>').join(inline('extract.js'))
     .split('<script src="ui.js"></script>').join(mock + inline('ui.js'))
     .split('<script src="app.js"></script>').join(inline('app.js'));
 }
@@ -129,13 +128,12 @@ function buildHtml() {
     assert(d.querySelector('#btn-dl-lbl').textContent === 'Download 0', 'label after clear wrong');
   });
 
-  await t('download queue hits /api/download proxy', async () => {
+  await t('download queue starts a client-side save', async () => {
     d.querySelector('#grid .mg-card').click();
     d.querySelector('#btn-dl').click();
     await wait(600);
     assert(window.__dls.length === 1, 'downloads fired = ' + window.__dls.length);
-    assert(window.__dls[0].includes('/api/download?url='), 'href = ' + window.__dls[0]);
-    assert(window.__dls[0].includes('name='), 'name param missing');
+    assert(/photo_890_o\.jpg|blob:/.test(window.__dls[0]), 'href = ' + window.__dls[0]);
   });
 
   await t('recents saved and clickable', () => {

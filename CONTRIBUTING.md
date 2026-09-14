@@ -1,15 +1,14 @@
 # Contributing
 
-## Run locally
+## Run locally (client-side)
 
 ```bash
 git clone https://github.com/rutaabali3/MEDIA_404.git
 cd MEDIA_404
-npm install
-npm start
+npx --yes serve public
 ```
 
-Open http://localhost:3000
+The app is static files in `public/`. No Node API is required.
 
 ## Tests
 
