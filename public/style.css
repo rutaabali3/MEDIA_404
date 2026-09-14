@@ -97,6 +97,24 @@ button { font-family: inherit; }
 /* ---------- Layout ---------- */
 .wrap { max-width: 880px; margin: 0 auto; padding: 12px 16px 0; width: 100%; flex: 1; }
 
+.gh-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 13px; line-height: 1.45;
+}
+.gh-banner[hidden] { display: none; }
+.gh-banner .msr { flex: none; margin-top: 1px; }
+.gh-banner a { color: inherit; font-weight: 700; }
+.gh-banner code {
+  font-size: 12px;
+  background: color-mix(in srgb, var(--md-on-primary-container) 10%, transparent);
+  padding: 1px 6px; border-radius: 6px;
+}
+
 /* ---------- Buttons (M3) ---------- */
 .mg-btn {
   position: relative; overflow: hidden;
