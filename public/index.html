@@ -33,8 +33,12 @@
     <section class="grab-card">
       <div class="grab-row">
         <span class="msr msr-22 grab-ic">link</span>
-        <input id="url-input" type="url" autocomplete="off" spellcheck="false"
+        <!-- type="text" + inputmode="url": the app validates itself and accepts
+             bare links (tiktok.com/…) which native type="url" wrongly flags red -->
+        <input id="url-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off"
+               autocorrect="off" spellcheck="false" aria-invalid="false"
                placeholder="Paste a link — X post, TikTok, Reddit, YouTube, Amazon, Daraz, Pinterest…">
+        <span id="grab-field-err" class="msr msr-22 grab-field-err" title="Invalid link" hidden>error</span>
         <button id="btn-grab" class="mg-btn mg-fab"><span class="msr msr-18">radar</span>Grab</button>
       </div>
       <div id="grab-err" class="grab-err" hidden></div>

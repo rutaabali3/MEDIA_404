@@ -166,11 +166,50 @@ function buildHtml() {
     assert(d.querySelector('#mg-sub').textContent === 'Universal mode · any site', 'universal sub wrong');
   });
 
-  await t('invalid link shows error', async () => {
-    d.querySelector('#url-input').value = 'not a url';
+  await t('input uses no native url validation (bare links accepted)', () => {
+    const input = d.querySelector('#url-input');
+    assert(input.getAttribute('type') !== 'url', 'type=' + input.getAttribute('type') + ' paints valid bare links red');
+    assert(input.getAttribute('inputmode') === 'url', 'url keyboard hint missing');
+    assert(input.getAttribute('aria-invalid') === 'false', 'should start valid');
+    assert(d.querySelector('#grab-field-err').hidden, 'error icon should start hidden');
+  });
+
+  await t('bare link without https:// grabs and brands (no false red)', async () => {
+    d.querySelector('#url-input').value = 'www.reddit.com/r/pics/comments/abc123/cool_pic/';
+    d.querySelector('#btn-grab').click();
+    await wait(300);
+    assert(d.querySelector('#grab-err').hidden, 'error banner wrongly shown for bare link');
+    assert(d.querySelector('#url-input').getAttribute('aria-invalid') === 'false', 'field marked invalid for bare link');
+    assert(d.querySelector('#mg-title').textContent === 'Reddit', 'title = ' + d.querySelector('#mg-title').textContent);
+  });
+
+  await t('typing a bare domain live-brands the app bar', () => {
+    const input = d.querySelector('#url-input');
+    input.value = 'tiktok.com/@user/video/123';
+    input.dispatchEvent(new window.Event('input'));
+    assert(d.querySelector('#mg-title').textContent === 'TikTok', 'title = ' + d.querySelector('#mg-title').textContent);
+    assert(d.querySelector('#grab-err').hidden, 'error shown while typing');
+  });
+
+  await t('invalid link shows app error state on the field', async () => {
+    const input = d.querySelector('#url-input');
+    input.value = 'not a url';
     d.querySelector('#btn-grab').click();
     await wait(150);
-    assert(!d.querySelector('#grab-err').hidden, 'no error shown');
+    assert(!d.querySelector('#grab-err').hidden, 'no error banner shown');
+    assert(input.getAttribute('aria-invalid') === 'true', 'aria-invalid not set');
+    assert(d.querySelector('.grab-card').classList.contains('err'), 'error class missing on card');
+    assert(!d.querySelector('#grab-field-err').hidden, 'field error icon hidden');
+  });
+
+  await t('editing the field clears the error state', () => {
+    const input = d.querySelector('#url-input');
+    input.value = 'youtube.com/watch?v=x';
+    input.dispatchEvent(new window.Event('input'));
+    assert(input.getAttribute('aria-invalid') === 'false', 'aria-invalid still true');
+    assert(!d.querySelector('.grab-card').classList.contains('err'), 'error class not cleared');
+    assert(d.querySelector('#grab-field-err').hidden, 'error icon still visible');
+    assert(d.querySelector('#grab-err').hidden, 'error banner still visible');
   });
 
   window.close();

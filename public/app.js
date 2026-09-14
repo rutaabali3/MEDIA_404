@@ -130,12 +130,27 @@
     $('#btn-grab').disabled = b;
   }
 
+  function setFieldError(bad) {
+    const input = $('#url-input');
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    $('.grab-card').classList.toggle('err', bad);
+    $('#grab-field-err').hidden = !bad;
+  }
   function showError(msg) {
     const el = $('#grab-err');
     el.textContent = msg;
     el.hidden = false;
+    setFieldError(true);
   }
-  function hideError() { $('#grab-err').hidden = true; }
+  function hideError() {
+    $('#grab-err').hidden = true;
+    setFieldError(false);
+  }
+
+  // bare links (tiktok.com/…) are supported — grab() prepends https:// itself
+  function withScheme(v) {
+    return /^https?:\/\//i.test(v) ? v : 'https://' + v;
+  }
 
   function runExtract(url) {
     if (typeof window.__MG_TEST_EXTRACT === 'function') return window.__MG_TEST_EXTRACT(url);
@@ -147,12 +162,12 @@
 
   async function grab(url) {
     url = String(url || '').trim();
-    if (!url) return;
+    if (!url) { showError('Paste a link first.'); return; }
     if (STATE.busy) return;
-    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     let valid;
-    try { valid = new URL(url); } catch (e) { showError('That link looks invalid.'); return; }
+    try { valid = new URL(withScheme(url)); } catch (e) { showError('That link looks invalid.'); return; }
     if (!/^https?:$/.test(valid.protocol)) { showError('Only http(s) links are supported.'); return; }
+    url = valid.href;
 
     STATE.selected.clear();
     hideError();
@@ -337,14 +352,21 @@
     $('#btn-grab').addEventListener('click', () => grab($('#url-input').value));
     $('#url-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') grab($('#url-input').value); });
     $('#url-input').addEventListener('input', () => {
+      // editing clears a previous error
+      hideError();
       // live detection preview, like the extension's auto-detect
       const v = $('#url-input').value.trim();
-      if (/^https?:\/\//i.test(v)) {
-        try {
-          STATE.site = MG.detectSite(hostOf(v));
-          renderHeader();
-        } catch (e) { /* noop */ }
+      if (!v) {
+        if (STATE.site.id !== 'universal') { STATE.site = MG.UNIVERSAL; renderHeader(); }
+        return;
       }
+      try {
+        const host = hostOf(withScheme(v));
+        if (host && host.includes('.')) {
+          STATE.site = MG.detectSite(host);
+          renderHeader();
+        }
+      } catch (e) { /* noop */ }
     });
 
     // select all / clear
@@ -378,13 +400,14 @@
       renderRecents();
     });
 
-    // paste anywhere → grab
+    // paste anywhere → grab (full URLs and bare links like tiktok.com/x)
     document.addEventListener('paste', (e) => {
       if (document.activeElement && document.activeElement.id === 'url-input') return;
       const t = (e.clipboardData || window.clipboardData).getData('text') || '';
-      if (/^https?:\/\//i.test(t.trim())) {
-        $('#url-input').value = t.trim();
-        grab(t.trim());
+      const v = t.trim();
+      if (/^https?:\/\//i.test(v) || /^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#]\S*)?$/i.test(v)) {
+        $('#url-input').value = v;
+        grab(v);
       }
     });
   });

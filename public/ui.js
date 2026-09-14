@@ -77,7 +77,7 @@ function m3Theme(seedHex) {
     '--md-outline-variant:' + hslStr(h, s * 0.1, 90) + ';' +
     '--md-inverse-surface:' + hslStr(h, s * 0.3, 22) + ';' +
     '--md-inverse-on-surface:' + hslStr(h, s * 0.1, 96) + ';' +
-    '--md-error-container:#f9dedc;--md-on-error-container:#410e0b;' +
+    '--md-error:#b3261e;--md-error-container:#f9dedc;--md-on-error-container:#410e0b;' +
     '--md-elev1:0 1px 2px rgba(0,0,0,.18), 0 1px 3px 1px rgba(0,0,0,.10);' +
     '--md-elev2:0 1px 2px rgba(0,0,0,.22), 0 2px 6px 2px rgba(0,0,0,.12);' +
     '--md-elev3:0 4px 8px 3px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.22);' +
@@ -100,7 +100,7 @@ function m3Theme(seedHex) {
     '--md-outline-variant:' + hslStr(h, s * 0.12, 30) + ';' +
     '--md-inverse-surface:' + hslStr(h, s * 0.12, 90) + ';' +
     '--md-inverse-on-surface:' + hslStr(h, s * 0.4, 20) + ';' +
-    '--md-error-container:#8c1d18;--md-on-error-container:#f9dedc;' +
+    '--md-error:#f2b8b5;--md-error-container:#8c1d18;--md-on-error-container:#f9dedc;' +
     '}}';
 }
 
