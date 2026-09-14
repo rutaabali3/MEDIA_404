@@ -29,6 +29,15 @@
 
   <main class="wrap">
 
+    <div id="gh-banner" class="gh-banner" hidden>
+      <span class="msr">cloud_off</span>
+      <div>
+        <b>This GitHub Pages copy is static</b> — grabbing media needs the Node server.
+        <a href="https://codespaces.new/rutaabali3/MEDIA_404">Open in GitHub Codespaces</a>
+        or clone the repo and run <code>npm install && npm start</code>.
+      </div>
+    </div>
+
     <!-- link input -->
     <section class="grab-card">
       <div class="grab-row">
@@ -37,7 +46,7 @@
                placeholder="Paste a link — X post, TikTok, Reddit, YouTube, Amazon, Daraz, Pinterest…">
         <button id="btn-grab" class="mg-btn mg-fab"><span class="msr msr-18">radar</span>Grab</button>
       </div>
-      <div id="grab-err" hidden></div>
+      <div id="grab-err" class="grab-err" hidden></div>
     </section>
 
     <!-- status line -->

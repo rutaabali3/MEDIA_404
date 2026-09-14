@@ -13,6 +13,7 @@ const { proxyDownload } = require('./lib/download');
 
 const app = express();
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h', index: 'index.html' }));
 
 /* tiny in-memory rate limiter (60 req/min per IP) */

@@ -3,10 +3,32 @@
   "version": "1.0.0",
   "description": "MediaGrab 404 — paste any post or product link, get its media. Server-side extraction + download proxy.",
   "main": "server.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js",
-    "test": "node tests/extract.test.js"
+    "test": "node tests/extract.test.js",
+    "test:smoke": "node tests/smoke.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rutaabali3/MEDIA_404.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rutaabali3/MEDIA_404/issues"
+  },
+  "homepage": "https://github.com/rutaabali3/MEDIA_404#readme",
+  "keywords": [
+    "media-downloader",
+    "express",
+    "social-media",
+    "instagram",
+    "tiktok",
+    "reddit",
+    "youtube"
+  ],
   "dependencies": {
     "cheerio": "^1.0.0",
     "express": "^4.19.2"

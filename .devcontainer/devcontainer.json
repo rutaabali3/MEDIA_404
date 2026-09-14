@@ -1,0 +1,18 @@
+{
+  "name": "MediaGrab 404",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "MediaGrab 404",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postStartCommand": "sh -c 'nohup npm start > /tmp/mediagrab.log 2>&1 &'",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}

@@ -10,6 +10,10 @@
 
   const RECENT_KEY = 'mg404-recents';
   const SETTINGS_KEY = 'mg404-settings';
+  const GH_CODESPACES = 'https://codespaces.new/rutaabali3/MEDIA_404';
+  const GH_CLONE = 'https://github.com/rutaabali3/MEDIA_404';
+
+  let apiReady = true;
 
   const STATE = {
     site: MG.UNIVERSAL,
@@ -137,10 +141,28 @@
   }
   function hideError() { $('#grab-err').hidden = true; }
 
+  async function checkApi() {
+    try {
+      const r = await fetch('/api/health', { cache: 'no-store' });
+      apiReady = !!(r && r.ok);
+    } catch (e) {
+      apiReady = false;
+    }
+    const banner = $('#gh-banner');
+    if (banner) banner.hidden = apiReady;
+    if (!apiReady) {
+      setStatus('server not running — use GitHub Codespaces or clone the repo');
+    }
+  }
+
   async function grab(url) {
     url = String(url || '').trim();
     if (!url) return;
     if (STATE.busy) return;
+    if (!apiReady) {
+      showError('The extract API is not running here (GitHub Pages is static). Open in Codespaces: ' + GH_CODESPACES + ' — or clone ' + GH_CLONE);
+      return;
+    }
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     let valid;
     try { valid = new URL(url); } catch (e) { showError('That link looks invalid.'); return; }
