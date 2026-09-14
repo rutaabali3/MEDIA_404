@@ -167,6 +167,10 @@ button { font-family: inherit; }
   font: inherit; font-size: 14.5px;
 }
 #url-input::placeholder { color: var(--md-on-surface-variant); }
+/* app-driven error state (only set after Grab actually fails) */
+.grab-card.err { box-shadow: var(--md-elev1), inset 0 0 0 2px var(--md-error, #b3261e); }
+#url-input[aria-invalid="true"] { color: var(--md-error, #b3261e); }
+.grab-field-err { color: var(--md-error, #b3261e); flex: none; }
 .grab-err {
   margin-top: 10px; padding: 10px 14px;
   background: var(--md-error-container, #f9dedc);
@@ -174,6 +178,7 @@ button { font-family: inherit; }
   border-radius: 12px; font-size: 13px;
   display: flex; gap: 8px; align-items: flex-start;
 }
+.grab-err[hidden] { display: none; }
 .grab-err::before { content: 'error'; font-family: 'Material Symbols Rounded'; font-size: 18px; flex: none; }
 
 /* ---------- Status line (same as extension toolbar) ---------- */
