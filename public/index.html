@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MediaGrab 404 — paste a link, grab the media</title>
+<link rel="icon" type="image/png" href="icon128.png">
+<meta name="description" content="One grabber for every site. Paste an X, TikTok, Reddit, YouTube, Amazon, Daraz or any post/product link — get its images, videos, audio and files.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..600,0..1,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top app bar: auto-detected app, brand gradient + exact logo (same as the extension) -->
+  <header id="appbar">
+    <div class="hd-top">
+      <div id="mg-logo" class="mg-logo"></div>
+      <div class="hd-txt">
+        <div id="mg-title">MediaGrab 404</div>
+        <div id="mg-sub">Universal mode · any site</div>
+      </div>
+      <button id="mg-settings" class="mg-icon-btn" title="Settings"><span class="msr">settings</span></button>
+    </div>
+    <div id="mg-pills" class="mg-pills"></div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- link input -->
+    <section class="grab-card">
+      <div class="grab-row">
+        <span class="msr msr-22 grab-ic">link</span>
+        <input id="url-input" type="url" autocomplete="off" spellcheck="false"
+               placeholder="Paste a link — X post, TikTok, Reddit, YouTube, Amazon, Daraz, Pinterest…">
+        <button id="btn-grab" class="mg-btn mg-fab"><span class="msr msr-18">radar</span>Grab</button>
+      </div>
+      <div id="grab-err" hidden></div>
+    </section>
+
+    <!-- status line -->
+    <div class="toolbar">
+      <div id="mg-status">
+        <span class="msr msr-16 spin" id="mg-status-icon" hidden>progress_activity</span>
+        <span id="mg-status-txt">idle</span>
+      </div>
+    </div>
+
+    <!-- filter chips -->
+    <div id="filters" class="mg-chips"></div>
+
+    <!-- media grid -->
+    <div id="grid" class="mg-grid"></div>
+    <div id="empty" class="mg-empty">
+      <span class="msr msr-48">search_off</span>
+      <div class="mg-empty-title">Nothing found yet</div>
+      <div class="mg-empty-txt" id="empty-txt">Paste a post / product link and press <b>Grab</b>.</div>
+    </div>
+
+    <!-- recents -->
+    <section class="card" id="recents-card" hidden>
+      <h2><span class="msr">history</span>Recent grabs</h2>
+      <div class="recents" id="recents"></div>
+    </section>
+
+    <!-- supported platforms -->
+    <section class="card" id="sites-card">
+      <h2><span class="msr">apps</span>Works with</h2>
+      <p class="card-sub">35 platforms detected automatically — the page re-brands to the one you pasted.</p>
+      <div class="sites" id="sites"></div>
+    </section>
+
+    <!-- honest notes -->
+    <section class="card" id="notes-card">
+      <h2><span class="msr">info</span>Good to know</h2>
+      <ul class="notes">
+        <li><b>Public content only.</b> Posts and product pages everyone can see. Content hidden behind a login can't be reached by any web tool.</li>
+        <li><b>Downloads are proxied</b> through the server, so CDNs that block hotlinking still work.</li>
+        <li><b>No DRM.</b> Netflix, Spotify, Prime Video are encrypted by design and not supported.</li>
+        <li><b>YouTube:</b> covers and page media only — full video downloads break YouTube's terms.</li>
+        <li><b>Live streams (m3u8)</b> are listed as links — feed them to yt-dlp / ffmpeg to merge.</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- bottom app bar: same as the extension footer -->
+  <footer id="mg-foot">
+    <span id="mg-foot-note">Public content only — any link you can open works</span>
+    <button id="btn-sel" class="mg-btn mg-text">Select all</button>
+    <button id="btn-dl" class="mg-btn mg-fab" disabled><span class="msr msr-18">download</span><span id="btn-dl-lbl">Download 0</span></button>
+  </footer>
+
+  <!-- settings sheet -->
+  <div id="mg-sheet" hidden>
+    <div class="mg-sheet-inner">
+      <div class="mg-sheet-handle"></div>
+      <div class="mg-sheet-head">
+        <b>Settings</b>
+        <button id="mg-sheet-close" class="mg-icon-btn" title="Close"><span class="msr">close</span></button>
+      </div>
+      <label class="mg-switch-row">
+        <div>
+          <div class="mg-switch-label">Hide duplicate thumbnails</div>
+          <div class="mg-switch-desc">Same image at different resolutions appears once</div>
+        </div>
+        <input type="checkbox" id="set-dedupe" class="mg-switch">
+      </label>
+      <label class="mg-switch-row">
+        <div>
+          <div class="mg-switch-label">Ask before downloading</div>
+          <div class="mg-switch-desc">Confirm before the download queue starts</div>
+        </div>
+        <input type="checkbox" id="set-ask" class="mg-switch">
+      </label>
+      <label class="mg-switch-row">
+        <div>
+          <div class="mg-switch-label">Show recent grabs</div>
+          <div class="mg-switch-desc">Keep a list of the links you grabbed</div>
+        </div>
+        <input type="checkbox" id="set-recents" class="mg-switch">
+      </label>
+    </div>
+  </div>
+
+  <div id="progress"><div></div></div>
+  <div id="toast"></div>
+
+<script src="sites.js"></script>
+<script src="logos.js"></script>
+<script src="ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
