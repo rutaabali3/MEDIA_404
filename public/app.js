@@ -19,8 +19,18 @@
     selected: new Set(),
     busy: false,
     lastTitle: null,
-    settings: { dedupe: true, askFirst: false, showRecents: true }
+    settings: { dedupe: true, askFirst: false, showRecents: true },
+    hasApi: false
   };
+
+  async function checkApi() {
+    try {
+      const res = await fetch('/api/health');
+      if (res.ok) STATE.hasApi = true;
+    } catch (e) {
+      STATE.hasApi = false;
+    }
+  }
 
   function loadSettings() {
     try {
@@ -152,8 +162,22 @@
     return /^https?:\/\//i.test(v) ? v : 'https://' + v;
   }
 
-  function runExtract(url) {
+  async function runExtract(url) {
     if (typeof window.__MG_TEST_EXTRACT === 'function') return window.__MG_TEST_EXTRACT(url);
+
+    if (STATE.hasApi) {
+      const res = await fetch('/api/extract?url=' + encodeURIComponent(url));
+      if (!res.ok) {
+        let errStr = 'Extraction failed';
+        try {
+          const errData = await res.json();
+          errStr = errData.error || errStr;
+        } catch(e) {}
+        throw new Error(errStr);
+      }
+      return res.json();
+    }
+
     if (!window.__MGExtract || typeof window.__MGExtract.extract !== 'function') {
       return Promise.reject(new Error('Extractor failed to load'));
     }
@@ -284,6 +308,17 @@
 
   /* ---------------- downloads (client-side blob, else open the file) ---------------- */
   async function dlUrl(url, name) {
+    if (STATE.hasApi) {
+      const a = document.createElement('a');
+      a.href = '/api/download?url=' + encodeURIComponent(url) + '&name=' + encodeURIComponent(name || '');
+      a.download = name || '';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 5000);
+      return;
+    }
+
     try {
       if (window.__MGExtract && typeof window.__MGExtract.download === 'function' && typeof window.__MG_TEST_EXTRACT !== 'function') {
         await window.__MGExtract.download(url, name);
@@ -339,6 +374,7 @@
 
   /* ---------------- init ---------------- */
   document.addEventListener('DOMContentLoaded', () => {
+    checkApi();
     loadSettings();
     applyM3Theme(MG.UNIVERSAL.color);
     renderHeader();
